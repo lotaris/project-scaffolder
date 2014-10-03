@@ -1,0 +1,6 @@
+.DS_Store
+/target/
+/{{ artifactIdPrefix }}-ear/target/
+/{{ artifactIdPrefix }}-ejb/target/
+/{{ artifactIdPrefix }}-jar/target/
+/{{ artifactIdPrefix }}-war/target/

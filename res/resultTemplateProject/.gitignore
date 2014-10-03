@@ -1,0 +1,6 @@
+.DS_Store
+/target/
+/dummyArtifact-ear/target/
+/dummyArtifact-ejb/target/
+/dummyArtifact-jar/target/
+/dummyArtifact-war/target/

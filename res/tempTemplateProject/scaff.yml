@@ -1,0 +1,6 @@
+prompt:
+  properties:
+    dummy:
+      message: "dummy"
+      required: true
+      default: "dummy"

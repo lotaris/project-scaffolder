@@ -1,0 +1,8 @@
+prompt:
+  properties:
+    username:
+      message: "Enter your username"
+      required: true
+    subPath:
+      message: "Enter the sub path"
+      required: true

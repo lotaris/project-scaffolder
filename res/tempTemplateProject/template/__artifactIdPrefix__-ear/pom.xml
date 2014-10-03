@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>{{ groupId }}</groupId>
+		<artifactId>{{ artifactIdPrefix }}</artifactId>
+		<version>{{ initialVersion }}-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>{{ artifactIdPrefix }}-ear</artifactId>
+	<packaging>ear</packaging>
+	<name>{{ projectHumanName }} EAR</name>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-ear-plugin</artifactId>
+				<configuration>
+					<modules>
+						<jarModule>
+							<groupId>{{ groupId }}</groupId>
+							<artifactId>{{ artifactIdPrefix }}-jar</artifactId>
+						</jarModule>
+						<ejbModule>
+							<groupId>{{ groupId }}</groupId>
+							<artifactId>{{ artifactIdPrefix }}-ejb</artifactId>
+						</ejbModule>
+						<webModule>
+							<groupId>{{ groupId }}</groupId>
+							<artifactId>{{ artifactIdPrefix }}-war</artifactId>
+							<contextRoot>/${project.{{ mavenPathShortName }}.server.context.root}</contextRoot>
+						</webModule>
+					</modules>
+				</configuration>
+			</plugin>
+		</plugins>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>{{ groupId }}</groupId>
+			<artifactId>{{ artifactIdPrefix }}-jar</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>{{ groupId }}</groupId>
+			<artifactId>{{ artifactIdPrefix }}-ejb</artifactId>
+			<version>${project.version}</version>
+			<type>ejb</type>
+		</dependency>
+		<dependency>
+			<groupId>{{ groupId }}</groupId>
+			<artifactId>{{ artifactIdPrefix }}-war</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>{{ groupId }}</groupId>
+			<artifactId>{{ artifactIdPrefix }}-war</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type>
+		</dependency>
+	</dependencies>
+</project>
