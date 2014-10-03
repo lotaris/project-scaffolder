@@ -219,7 +219,7 @@ Please add a changelog entry with your name for new features and bug fixes.
 
 ## License
 
-API Copilot is licensed under the [MIT License](http://opensource.org/licenses/MIT).
+Project Scaffolder is licensed under the [MIT License](http://opensource.org/licenses/MIT).
 See [LICENSE.txt](LICENSE.txt) for the full text.
 
 [annotated-source]: http://lotaris.github.io/project-scaffolder/annotated/index.js.html
