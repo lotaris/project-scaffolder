@@ -1,0 +1,12 @@
+{
+  "name": "project-scaffolder-examples-second",
+  "description": "Second example for the Project Scaffolder tool.",
+  "version": "0.0.1",
+  "dependencies": {
+    "project-scaffolder": "0.0.1"
+  },
+  "author": {
+    "name": "Laurent Prevost",
+    "email": "laurent.prevost@forbes-digital.com"
+  }
+}
