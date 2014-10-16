@@ -59,8 +59,12 @@ describe("Operations.Processor", function() {
       return this.templateConfig.filtering;
     });
 
-    config.templateEngine.renderFile.andCallFake(function(string, options) {
-      return 'templateContent';
+    config.templateEngine.renderFile.andCallFake(function(string, options, callback) {
+      return {
+        then: function(fn) {
+          fn('templateContent');
+        }
+      };
     });
 
     processor.generateFile({src: 'source', dest: 'destination'});

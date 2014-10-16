@@ -1,7 +1,7 @@
 {
   "name": "project-scaffolder",
   "description": "Project generator from templates",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "main": "./lib",
   "scripts": {
     "test": "grunt"
@@ -19,16 +19,17 @@
     "tmp-sync": "^1.0.1"
   },
   "dependencies": {
-    "prompt": "^0.2.13",
-    "js-yaml": "^3.1.0",
-    "swig": "^1.4.2",
-    "underscore": "^1.6.0",
-    "q": "^1.0.1",
-    "isbinaryfile": "^2.0.1",
     "electrolyte": "0.0.3",
-    "shelljs": "^0.3.0",
+    "fs-more": "0.0.4",
     "inflection": "^1.4.2",
-    "fs-more": "0.0.4"
+    "isbinaryfile": "^2.0.1",
+    "js-yaml": "^3.1.0",
+    "nunjucks": "^1.1.0",
+    "prompt": "^0.2.13",
+    "q": "^1.0.1",
+    "rox-client-node": "^0.1.0",
+    "shelljs": "^0.3.0",
+    "underscore": "^1.6.0"
   },
   "homepage": "",
   "bugs": {

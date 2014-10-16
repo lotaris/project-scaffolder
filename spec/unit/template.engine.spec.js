@@ -9,15 +9,22 @@ describe("Template.Engine", function() {
   };
 
   var templateEngine;
-  var swig;
+  var renderString;
+  var render;
 
   beforeEach(function() {
-    swig = {
-      render: jasmine.createSpy(),
-      renderFile: jasmine.createSpy()
+    renderString = jasmine.createSpy();
+    render = jasmine.createSpy();
+
+    var nunjucks = {
+      Environment: function() {
+        this.renderString = renderString;
+        this.render = render;
+        this.addFilter = jasmine.createSpy();
+      }
     };
 
-    var TemplateEngine = templateEngineFactory(swig);
+    var TemplateEngine = templateEngineFactory(nunjucks);
 
     templateEngine = new TemplateEngine();
   });
@@ -36,8 +43,8 @@ describe("Template.Engine", function() {
     expect(result).toEqual("amazing/somePath/amazing/someOtherPath/amazing");
   });
 
-  it("For a path with three values with swig filters to filter, the exec method on regex should be called three times", function() {
-    swig.render.andCallFake(function(string, options) {
+  it("For a path with three values with nunjucks filters to filter, the exec method on regex should be called three times", function() {
+    renderString.andCallFake(function(string, options) {
       return filteringConfig.valueToReplace;
     });
 
@@ -46,23 +53,30 @@ describe("Template.Engine", function() {
     var result = templateEngine.renderPath(filteringConfig, "__valueToReplace-filter__/somePath/__valueToReplace-filter__/someOtherPath/__valueToReplace__");
 
     expect(templateEngine.pathPattern.exec.calls.length).toEqual(4);
-    expect(swig.render.calls.length).toEqual(2);
+    expect(renderString.calls.length).toEqual(2);
     expect(result).toEqual("amazing/somePath/amazing/someOtherPath/amazing");
   });
 
-  it("Rendering a file should be delegated to swig with proper parameters", function() {
-    swig.renderFile.andCallFake(function(path, options) {
-      return "someFileContentRendered";
+  it("Rendering a file should be delegated to nunjucks with proper parameters", function() {
+    render.andCallFake(function(path, options, callback) {
+      callback(null, "someFileContentRendered");
     });
 
-    var result = templateEngine.renderFile(filteringConfig, "some/path/to/a/file");
+    templateEngine.renderFile(filteringConfig, "some/path/to/a/file").then(function(result) {
+      expect(result).toEqual('someFileContentRendered');
+    });
 
-    expect(swig.renderFile).toHaveBeenCalledWith("some/path/to/a/file", filteringConfig);
-    expect(result).toEqual('someFileContentRendered');
+    waitsFor(function() {
+      return render.calls.length;
+    }, "render should have been called", 100);
+
+    runs(function() {
+      expect(render).toHaveBeenCalledWith("some/path/to/a/file", filteringConfig, jasmine.any(Function));
+    });
   });
 
   it("An error should be thrown when there is an error occurs in the path rendering", function() {
-    swig.render.andCallFake(function(path, options) {
+    renderString.andCallFake(function(path, options) {
       throw new Error("Dummy error");
     });
 

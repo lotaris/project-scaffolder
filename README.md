@@ -169,7 +169,7 @@ The files stored in the template folder can be:
 * `text` files that will be handled by templating engine to apply the filtering;
 * `binary` file that will be simply copy from the project template to the project generated.
 
-During the generation process, each `text` files will be given to [Swig](http://paularmstrong.github.io/swig/) which is the template engine used in `project-scaffolder`. This template engine is based on [Jinja](http://jinja.pocoo.org/) template engine. Then the syntax is quite similar and the possiblity to use filters is there. It means that you can be able to write something like that in your template files:
+During the generation process, each `text` files will be given to [Nunjucks](http://mozilla.github.io/nunjucks/) which is the template engine used in `project-scaffolder`. This template engine is based on [Jinja](http://jinja.pocoo.org/) template engine. Then the syntax is quite similar and the possiblity to use filters is there. It means that you can be able to write something like that in your template files:
 
 ```
 {{ someVariable | upper }}
