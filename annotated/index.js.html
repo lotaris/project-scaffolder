@@ -45,7 +45,7 @@
 <p>This tool provides a pattern to run sequential asynchronous steps while
 avoiding callbacks with the use of <a href="http://promises-aplus.github.io/promises-spec/">promises</a>.
 Promises are provided by the <a href="https://github.com/kriskowal/q">q</a> library.
-In addition, <a href="http://paularmstrong.github.io/swig">Swig</a> is used to render the project template files.</p>
+In addition, <a href="http://mozilla.github.io/nunjucks/">Nunjucks</a> is used to render the project template files. This is an Asynchronous template engine.</p>
         </td>
         <td class="code highlight"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">ioc</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./ioc&#39;</span><span class="p">);</span>
 
@@ -72,7 +72,7 @@ In addition, <a href="http://paularmstrong.github.io/swig">Swig</a> is used to r
 <li><a href="operations.processor.js.html">operations.processor.js</a> - module to process the various file operations for the project generation.</li>
 <li><a href="print.js.html">print.js</a> - simple wrapper for the console.log at the moment but can be improved for better outputs;</li>
 <li><a href="prompt.wrapper.js.html">prompt.wrapper.js</a> - prompt wrapper to be able to use or implement a different prompt;</li>
-<li><a href="template.engine.js.html">template.engine.js</a> - for the file generation and path resolution, a template engine is used. Currently, SWIG is used.</li>
+<li><a href="template.engine.js.html">template.engine.js</a> - for the file generation and path resolution, a template engine is used. Currently, Nunjucks is used.</li>
 </ul>
         </td>
         <td class="code highlight"><div class="highlight"><pre>

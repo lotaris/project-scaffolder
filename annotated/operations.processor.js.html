@@ -209,7 +209,10 @@ The destination file is the file in its final shape ready to use.</p>
         </td>
         <td class="code highlight"><div class="highlight"><pre>
     <span class="nx">generateFile</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">operation</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">outputFileQ</span><span class="p">(</span><span class="nx">operation</span><span class="p">.</span><span class="nx">dest</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">templateEngine</span><span class="p">.</span><span class="nx">renderFile</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">getFilteringConfig</span><span class="p">(),</span> <span class="nx">operation</span><span class="p">.</span><span class="nx">src</span><span class="p">));</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">templateEngine</span><span class="p">.</span><span class="nx">renderFile</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">getFilteringConfig</span><span class="p">(),</span> <span class="nx">operation</span><span class="p">.</span><span class="nx">src</span><span class="p">).</span>
+        <span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">content</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">outputFileQ</span><span class="p">(</span><span class="nx">operation</span><span class="p">.</span><span class="nx">dest</span><span class="p">,</span> <span class="nx">content</span><span class="p">);</span>
+        <span class="p">});</span>
     <span class="p">},</span>
 
 
