@@ -11,6 +11,7 @@ describe("Template.Engine", function() {
   var templateEngine;
   var renderString;
   var render;
+  var requireWrapper;
 
   beforeEach(function() {
     renderString = jasmine.createSpy();
@@ -24,7 +25,11 @@ describe("Template.Engine", function() {
       }
     };
 
-    var TemplateEngine = templateEngineFactory(nunjucks);
+    requireWrapper = {
+      require: jasmine.createSpy()
+    };
+
+    var TemplateEngine = templateEngineFactory(nunjucks, {}, requireWrapper);
 
     templateEngine = new TemplateEngine();
   });
@@ -84,4 +89,143 @@ describe("Template.Engine", function() {
       templateEngine.renderPath(config, "__valueToReplace-filter__/somePath/__valueToReplace-filter__/someOtherPath/__valueToReplace__");
     }).toThrow();
   });
+
+  it("Extra filters (sync/async) and tags (sync/async) should be available once configure was called on the template engine", function() {
+    var mockEngine = {
+      sFilters: {},
+      aFilters: {},
+      extensions: {},
+      addFilter: function(name, filter, async) {
+        if (async) {
+          this.aFilters[name] = filter;
+        }
+        else {
+          this.sFilters[name] = filter;
+        }
+      },
+      addExtension: function(name, extension) {
+        this.extensions[name] = extension;
+      }
+    };
+
+    spyOn(mockEngine, 'addFilter').andCallThrough();
+    spyOn(mockEngine, 'addExtension').andCallThrough();
+
+    templateEngine.engine = mockEngine;
+
+    requireWrapper.require.andCallFake(function(name) {
+      expect(name).toEqual("extra");
+      return {
+        syncFilters: {
+          sFilter1: function() {},
+          sFilter2: function() {}
+        },
+        asyncFilters: {
+          aFilter1: function() {},
+          aFilter2: function() {}
+        },
+        syncTags: {
+          sTag1: function() {},
+          sTag2: function() {}
+        },
+        asyncTags: {
+          aTag1: function() {},
+          aTag2: function() {}
+        }
+      };
+    });
+
+    templateEngine.configure(["extra"]);
+
+    expect(mockEngine.addFilter).toHaveBeenCalled();
+    expect(mockEngine.addFilter.calls.length).toEqual(4);
+    expect(mockEngine.addExtension).toHaveBeenCalled();
+    expect(mockEngine.addExtension.calls.length).toEqual(4);
+
+    expect(mockEngine.sFilters.sFilter1).toBeDefined();
+    expect(mockEngine.sFilters.sFilter2).toBeDefined();
+    expect(mockEngine.aFilters.aFilter1).toBeDefined();
+    expect(mockEngine.aFilters.aFilter2).toBeDefined();
+
+    expect(mockEngine.extensions.sTag1).toBeDefined();
+    expect(mockEngine.extensions.sTag2).toBeDefined();
+    expect(mockEngine.extensions.aTag1).toBeDefined();
+    expect(mockEngine.extensions.aTag2).toBeDefined();
+  });
+
+
+  it("Multiple extra modules should be loaded", function() {
+    var mockEngine = {
+      filters: {},
+      addFilter: function(name, filter, async) { this.filters[name] = filter; },
+      addExtension: jasmine.createSpy()
+    };
+
+    spyOn(mockEngine, 'addFilter').andCallThrough();
+
+    templateEngine.engine = mockEngine;
+
+    var modules = {
+      extra1: {
+        syncFilters: {
+          mf1: function() {}
+        }
+      },
+      extra2: {
+        syncFilters: {
+          mf2: function() {}
+        }
+      }
+    };
+
+    requireWrapper.require.andCallFake(function(name) {
+      return modules[name];
+    });
+
+    templateEngine.configure(["extra1", "extra2"]);
+
+    expect(mockEngine.addFilter).toHaveBeenCalled();
+    expect(mockEngine.addFilter.calls.length).toEqual(2);
+
+    expect(mockEngine.filters.mf1).toBeDefined();
+    expect(mockEngine.filters.mf2).toBeDefined();
+  });
+
+  it("Multiple extra modules with different syntax definition ((a|)sync(Filters|tags) vs. (filters|tags)(As|S)ync) should be loaded", function() {
+    var mockEngine = {
+      filters: {},
+      addFilter: function(name, filter, async) { this.filters[name] = filter; },
+      addExtension: jasmine.createSpy()
+    };
+
+    spyOn(mockEngine, 'addFilter').andCallThrough();
+
+    templateEngine.engine = mockEngine;
+
+    var modules = {
+      extra1: {
+        syncFilters: {
+          mf1: function() {}
+        }
+      },
+      extra2: {
+        filtersSync: {
+          mf2: function() {}
+        }
+      }
+    };
+
+    requireWrapper.require.andCallFake(function(name) {
+      return modules[name];
+    });
+
+    templateEngine.configure(["extra1", "extra2"]);
+
+    expect(mockEngine.addFilter).toHaveBeenCalled();
+    expect(mockEngine.addFilter.calls.length).toEqual(2);
+
+    expect(mockEngine.filters.mf1).toBeDefined();
+    expect(mockEngine.filters.mf2).toBeDefined();
+  });
+
 });

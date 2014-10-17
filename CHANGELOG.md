@@ -1,3 +1,7 @@
+## v0.3.0 - October 17, 2014
+
+* **ADDED**: Dynamic loading of extra modules to enrich [`Nunjucks`](http://mozilla.github.io/nunjucks/) template engine.
+
 ## v0.2.0 - October 15, 2014
 
 * **BREAKING**: Removed extra filters

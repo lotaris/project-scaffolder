@@ -1,7 +1,7 @@
 {
   "name": "project-scaffolder",
   "description": "Project generator from templates",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "./lib",
   "scripts": {
     "test": "grunt"
@@ -25,7 +25,7 @@
     "isbinaryfile": "^2.0.1",
     "js-yaml": "^3.1.0",
     "nunjucks": "^1.1.0",
-    "prompt": "^0.2.13",
+    "prompt": "^0.2.14",
     "q": "^1.0.1",
     "rox-client-node": "^0.1.0",
     "shelljs": "^0.3.0",

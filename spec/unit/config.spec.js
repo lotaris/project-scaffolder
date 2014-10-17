@@ -1,7 +1,8 @@
 var _ = require('underscore'),
     path = require('path'),
     configFactory = require('../../lib/config.js'),
-    Q = require('q');
+    Q = require('q'),
+    fsmore = require('fs-more');
 
 describe("Config", function() {
   var Configuration;
@@ -17,9 +18,8 @@ describe("Config", function() {
     mavenPathShortName: "wb"
   };
 
-  var yamlContent = "prompt:\n  properties:\n    test:\n      message: \"There is a message\"";
-
   var config;
+  var fs;
 
   var messages = [];
 
@@ -35,16 +35,12 @@ describe("Config", function() {
   beforeEach(function() {
     messages = [];
 
-    var fs = {
+    fs = {
       readFile: jasmine.createSpy()
     };
 
-    fs.readFile.andCallFake(function(path, options, callback) {
-      callback(undefined, yamlContent);
-    });
-
     Configuration = configFactory(prompt, print, fs);
-    config = new Configuration({ templateEngine: {}, templateConfigFile: "config.yml", templateFolder: "project" });
+    config = new Configuration({ templateEngine: { configure: jasmine.createSpy() }, templateConfigFile: "config.yml", templateFolder: "project" });
   });
 
   it("Some options are mandatory to create a new configuration", function() {
@@ -54,10 +50,10 @@ describe("Config", function() {
     expect(function() { new Configuration({ templateEngine: {}, templateConfigFile: "config.yml"}); }).toBeError("No template folder provided.");
     expect(function() { new Configuration({ templateEngine: {}, templateConfigFile: "config.yml", templateFolder: "project"}); }).not.toThrow();
 
-    var conf = new Configuration({ templateEngine: {}, templateConfigFile: "config.yml", templateFolder: "project"});
+    var conf = new Configuration({ templateEngine: { configure: jasmine.createSpy() }, templateConfigFile: "config.yml", templateFolder: "project"});
 
     expect(conf.templateEngine).not.toBeUndefined();
-    expect(conf.templateEngine).toEqual({});
+    expect(conf.templateEngine).toEqual({ configure: jasmine.any(Function) });
 
     expect(conf.templateConfigPath).not.toBeUndefined();
     expect(conf.templateConfigPath).toEqual(path.resolve("config.yml"));
@@ -72,11 +68,11 @@ describe("Config", function() {
     expect(config.fileOperations.length).toEqual(0);
 
     expect(config.templateEngine).not.toBeNull();
-    expect(config.templateEngine).toEqual({});
+    expect(config.templateEngine).toEqual({ configure: jasmine.any(Function) });
   });
 
   it("Should be possible to retrive the template filtering configuration on a configuration", function() {
-    var conf = new Configuration({ templateEngine: {}, templateConfigFile: "scaff.yml", templateFolder: "template" });
+    var conf = new Configuration({ templateEngine: { configure: jasmine.createSpy() }, templateConfigFile: "scaff.yml", templateFolder: "template" });
 
     conf.templateConfig = {
       prop1: "val1",
@@ -135,9 +131,11 @@ describe("Config", function() {
   });
 
   it("Project configuration should be available when read from YAML file", function() {
-    // config.realProjectConfigFile = path.join(path.resolve(defaultPromptResult.outputDirectory), "config.yml");
+    fs.readFile.andCallFake(function(p, options, callback) {
+      callback(undefined, fsmore.readFileSync(path.join('spec', 'unit', 'samples', 'validConfig.yml')));
+    });
 
-    config.readConfiguration();
+    config.configure();
 
     expect(config.templateConfig).not.toBeNull();
     expect(config.templateConfig.prompt).not.toBeNull();
@@ -146,6 +144,24 @@ describe("Config", function() {
 
     expect(config.templateConfig.prompt.properties.test.message).not.toBeNull();
     expect(config.templateConfig.prompt.properties.test.message).toEqual("There is a message");
+
+    expect(config.templateConfig.extras).toBeDefined();
+    expect(config.templateConfig.extras.length).toEqual(1);
+    expect(config.templateConfig.extras[0]).toEqual("extra-module");
+  });
+
+  it("Only authorized configuration should be present when configuration is read from YAML file", function() {
+    fs.readFile.andCallFake(function(p, options, callback) {
+      callback(undefined, fsmore.readFileSync(path.join('spec', 'unit', 'samples', 'configWithWrongConfiguration.yml')));
+    });
+
+    config.configure();
+
+    expect(config.templateConfig).not.toBeNull();
+    expect(config.templateConfig.prompt).not.toBeNull();
+    expect(config.templateConfig.prompt.test).toBeUndefined();
+
+    expect(config.templateConfig['extra-modules']).toBeUndefined();
   });
 
   it("Project should contains operations when we add them", function() {

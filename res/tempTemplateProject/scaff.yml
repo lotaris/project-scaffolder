@@ -1,6 +1,9 @@
 prompt:
   properties:
     dummy:
-      message: "dummy"
+      description: "dummy"
       required: true
       default: "dummy"
+
+extras:
+  - dummyNameNotReallyUsed

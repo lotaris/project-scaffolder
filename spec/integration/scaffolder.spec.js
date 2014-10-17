@@ -46,7 +46,17 @@ describe("Scaffolder", function() {
     scaffolder = new ProjectScaffolder();
 
     spyOn(scaffolder, 'buildConfiguration').andCallFake(function() {
-      var TemplateEngine = ioc.create('template.engine');
+      var TemplateEngine = require("../../lib/template.engine.js")(require('nunjucks'), require('fs-more'), {
+        require: function(name) {
+          return {
+            syncFilters: {
+              folderize: function(pkg) {
+                return pkg.replace(/\./g, path.sep);
+              }
+            }
+          };
+        }
+      });
 
       var Configuration = configurationFactory(prompt, print, fs);
 

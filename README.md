@@ -50,6 +50,7 @@ Check the [CHANGELOG](CHANGELOG.md) for information about new features and break
   * [Second example](#second-example)
 * [How to create a project template](#how-to-create-project-template)
 * [How to override config file and template folder](#how-to-override-config-folder)
+* [How to write the configuration file](#how-to-wraite-config-file)
 
 ## Examples
 
@@ -169,7 +170,7 @@ The files stored in the template folder can be:
 * `text` files that will be handled by templating engine to apply the filtering;
 * `binary` file that will be simply copy from the project template to the project generated.
 
-During the generation process, each `text` files will be given to [Nunjucks](http://mozilla.github.io/nunjucks/) which is the template engine used in `project-scaffolder`. This template engine is based on [Jinja](http://jinja.pocoo.org/) template engine. Then the syntax is quite similar and the possiblity to use filters is there. It means that you can be able to write something like that in your template files:
+During the generation process, each `text` files will be given to [Nunjucks][nunjucks] which is the template engine used in `project-scaffolder`. This template engine is based on [Jinja](http://jinja.pocoo.org/) template engine. Then the syntax is quite similar and the possiblity to use filters is there. It means that you can be able to write something like that in your template files:
 
 ```
 {{ someVariable | upper }}
@@ -208,6 +209,126 @@ $> SCAFF_TEMPLATE_CONFIG_FILE=some/great/path/to/config.yml SCAFF_TEMPLATE_FOLDE
 
 You can use only one of these options if you want.
 
+<a name="how-to-wraite-config-file"></a>
+## How to write a configuration file
+
+First, you need to create the file `scaff.yml` at the root of your template project.
+
+Now, you are able to write something like that:
+
+```yml
+prompt:
+  properties:
+    propertyName:
+      message: Some message there
+      required: true
+      default: some default value
+
+extras:
+  - extra-module
+```
+
+### The `prompt.properties` configuration
+
+This configuration section defines the questions that will be asked when the command `project-scaffolder` is run in the template project.
+
+As the `project-scaffolder` use the module [`prompt`](https://www.npmjs.org/package/prompt) to present the command line user interface, you can define the options as described in `prompt` documentation.
+
+There is only one exception which do not allow to use `before`.
+
+Then you can define a command line question like that:
+
+```yml
+propertyName:
+  description: String
+  type: String
+  pattern: RegExp
+  message: String
+  hidden: true|false
+  default: String
+  required: true|false
+```
+
+**Note**: The property name will be used as placeholder name during the templating process. Example:
+
+```yml
+package:
+  description: Define the root package for java classes
+  required: true
+  default: com.some.where
+```
+
+and one template somewhere:
+
+```java
+package {{ package }}.else;
+
+public class {
+}
+```
+
+which will produce that result if the default value is used:
+
+```java
+package com.some.where.else;
+
+public class {
+}
+```
+
+### The `extras` configuration
+
+This configuraiton section allow to load more modules for [`Nunjucks`][nunjucks] to enrich `filters` and `tags`.
+
+The module names specified in the list should be installed in the project as usual via `npm`.
+
+The modules must follow the requirements explained in [`project-scaffolder-extras`][pse]
+
+In summary, extra module must expose an object which contains the following structure:
+
+```javascript
+module.syncFilters = {
+  syncFilterName: function(arg1, arg2, ...) {
+    ...
+    return ...;
+  }
+};
+
+module.asyncFilters = {
+  asyncFilterName: function(arg1, arg2, callback) {
+    ...
+    callback(err, res);
+  }
+};
+
+module.syncTags = {
+  syncTagName: function(...) { 
+    ...
+    return ...;
+  }
+};
+
+module.asyncTags = {
+  asyncTagName: function(..., callback) {
+    ...
+    callback(err, res);
+  }
+};
+```
+
+You can also have this syntax:
+
+```javascript
+module.filtersSync = {};
+module.filtersAsync = {};
+module.tagsSync = {};
+module.tagsAsync = {};
+```
+
+You should carefully read the documentation of `Nunjucks` to know how to write filters and tags (synchronous vs. asynchronous).
+
+**Note:** Currently, the asynchronous filters are not supported for the filtering process done in file paths of the template.
+
 ## Contributing
 
 * [Fork](https://help.github.com/articles/fork-a-repo)
@@ -227,3 +348,5 @@ See [LICENSE.txt](LICENSE.txt) for the full text.
 [first-result]: https://github.com/lotaris/project-scaffolder/tree/master/examples/results/first-example
 [second-example]: https://github.com/lotaris/project-scaffolder/tree/master/examples/sources/second-example
 [second-result]: https://github.com/lotaris/project-scaffolder/tree/master/examples/results/second-example
+[nunjucks]: http://mozilla.github.io/nunjucks/
+[pse]: https://github.com/lotaris/project-scaffolder-extras

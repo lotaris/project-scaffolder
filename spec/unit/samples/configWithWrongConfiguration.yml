@@ -1,0 +1,6 @@
+prompt:
+  test:
+    description: There is a message
+
+extraModules:
+  - extra-module
