@@ -142,8 +142,8 @@ describe("Config", function() {
     expect(config.templateConfig.prompt.properties).not.toBeNull();
     expect(config.templateConfig.prompt.properties.test).not.toBeNull();
 
-    expect(config.templateConfig.prompt.properties.test.message).not.toBeNull();
-    expect(config.templateConfig.prompt.properties.test.message).toEqual("There is a message");
+    expect(config.templateConfig.prompt.properties.test.description).not.toBeNull();
+    expect(config.templateConfig.prompt.properties.test.description).toEqual("There is a message");
 
     expect(config.templateConfig.extras).toBeDefined();
     expect(config.templateConfig.extras.length).toEqual(1);
