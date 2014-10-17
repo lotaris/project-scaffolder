@@ -48,7 +48,7 @@ able to apply some filtering of variables inside the file paths or contents.</p>
     <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">),</span>
     <span class="nx">roxClient</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;rox-client-node&#39;</span><span class="p">);</span>
 
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">nunjucks</span><span class="p">,</span> <span class="nx">fs</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">nunjucks</span><span class="p">,</span> <span class="nx">fs</span><span class="p">,</span> <span class="nx">requireWrapper</span><span class="p">)</span> <span class="p">{</span>
 
 </pre></div>
         </td>
@@ -158,6 +158,145 @@ out of the box in Nunjucks</p>
   <a class="pilcrow" href="#section-6" id="section-6">&#182;</a>
 </div>
 <div class="dox">
+  <div class="summary"><p>Process to the configuration of the current template engine</p>
+  </div>
+  <div class="body">
+  </div>
+  <div class="details">
+    <div class="dox_tag_title">Params</div>
+    <div class="dox_tag_detail">
+      <span class="dox_tag_name">extras</span>
+      <span class="dox_type">Array&lt;String&gt;</span>
+      <span>The list of extra modules to load and configure</span>
+    </div>
+  </div>
+</div>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+    <span class="nx">configure</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">extras</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">try</span> <span class="p">{</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-7" id="section-7">&#182;</a>
+</div>
+<p>Load each extra module</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+        <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">extras</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">moduleName</span><span class="p">)</span> <span class="p">{</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-8" id="section-8">&#182;</a>
+</div>
+<p>Load the module through the wrapper to be able to inject the require for testing purpose</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+          <span class="kd">var</span> <span class="nx">extraModule</span> <span class="o">=</span> <span class="nx">requireWrapper</span><span class="p">.</span><span class="nx">require</span><span class="p">(</span><span class="nx">moduleName</span><span class="p">);</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-9" id="section-9">&#182;</a>
+</div>
+<p>Be sure there is a loaded module</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+          <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">extraModule</span><span class="p">))</span> <span class="p">{</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-10" id="section-10">&#182;</a>
+</div>
+<p>Add synchronous filters</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+            <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">extraModule</span><span class="p">.</span><span class="nx">syncFilters</span> <span class="o">||</span> <span class="nx">extraModule</span><span class="p">.</span><span class="nx">filtersSync</span> <span class="o">||</span> <span class="p">{},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+              <span class="k">this</span><span class="p">.</span><span class="nx">engine</span><span class="p">.</span><span class="nx">addFilter</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">filter</span><span class="p">);</span>
+            <span class="p">},</span> <span class="k">this</span><span class="p">);</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-11" id="section-11">&#182;</a>
+</div>
+<p>Add asynchronous filters</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+            <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">extraModule</span><span class="p">.</span><span class="nx">asyncFilters</span> <span class="o">||</span> <span class="nx">extraModule</span><span class="p">.</span><span class="nx">filtersAsync</span> <span class="o">||</span> <span class="p">{},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+              <span class="k">this</span><span class="p">.</span><span class="nx">engine</span><span class="p">.</span><span class="nx">addFilter</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">filter</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+            <span class="p">},</span> <span class="k">this</span><span class="p">);</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-12" id="section-12">&#182;</a>
+</div>
+<p>Add synchronous tags</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+            <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">extraModule</span><span class="p">.</span><span class="nx">syncTags</span> <span class="o">||</span> <span class="nx">extraModule</span><span class="p">.</span><span class="nx">tagsSync</span> <span class="o">||</span> <span class="p">{},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">tag</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+              <span class="k">this</span><span class="p">.</span><span class="nx">engine</span><span class="p">.</span><span class="nx">addExtension</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">tag</span><span class="p">);</span>
+            <span class="p">},</span> <span class="k">this</span><span class="p">);</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-13" id="section-13">&#182;</a>
+</div>
+<p>Add asynchronous tags</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+            <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">extraModule</span><span class="p">.</span><span class="nx">asyncTags</span> <span class="o">||</span> <span class="nx">extraModule</span><span class="p">.</span><span class="nx">tagsAsync</span> <span class="o">||</span> <span class="p">{},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">tag</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+              <span class="k">this</span><span class="p">.</span><span class="nx">engine</span><span class="p">.</span><span class="nx">addExtension</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">tag</span><span class="p">);</span>
+            <span class="p">},</span> <span class="k">this</span><span class="p">);</span>
+          <span class="p">}</span>
+        <span class="p">},</span> <span class="k">this</span><span class="p">);</span>
+      <span class="p">}</span>
+      <span class="k">catch</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">stack</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-14" id="section-14">&#182;</a>
+</div>
+<div class="dox">
   <div class="summary"><p>Generate a path by applying some filtering to the paths</p>
   </div>
   <div class="body">
@@ -196,7 +335,7 @@ out of the box in Nunjucks</p>
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-7" id="section-7">&#182;</a>
+  <a class="pilcrow" href="#section-15" id="section-15">&#182;</a>
 </div>
 <p>Apply filtering until there is no more filter found in the path</p>
         </td>
@@ -211,7 +350,7 @@ out of the box in Nunjucks</p>
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-8" id="section-8">&#182;</a>
+  <a class="pilcrow" href="#section-16" id="section-16">&#182;</a>
 </div>
 <p>Check if the variable in the path is known</p>
         </td>
@@ -224,7 +363,7 @@ out of the box in Nunjucks</p>
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-9" id="section-9">&#182;</a>
+  <a class="pilcrow" href="#section-17" id="section-17">&#182;</a>
 </div>
 <p>No filter to apply to the variable</p>
         </td>
@@ -239,7 +378,7 @@ out of the box in Nunjucks</p>
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-10" id="section-10">&#182;</a>
+  <a class="pilcrow" href="#section-18" id="section-18">&#182;</a>
 </div>
 <p>Filter must be applied to the variable</p>
         </td>
@@ -253,7 +392,7 @@ out of the box in Nunjucks</p>
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-11" id="section-11">&#182;</a>
+  <a class="pilcrow" href="#section-19" id="section-19">&#182;</a>
 </div>
 <p>Create a Nunjucks filter syntax from the file filter syntax and apply the filtering</p>
         </td>
@@ -281,7 +420,7 @@ out of the box in Nunjucks</p>
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-12" id="section-12">&#182;</a>
+  <a class="pilcrow" href="#section-20" id="section-20">&#182;</a>
 </div>
 <div class="dox">
   <div class="summary"><p>Generate file content by applying some filtering to the content</p>
@@ -318,7 +457,7 @@ out of the box in Nunjucks</p>
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-13" id="section-13">&#182;</a>
+  <a class="pilcrow" href="#section-21" id="section-21">&#182;</a>
 </div>
 <p>Delegate the templating process to Nunjucks</p>
         </td>
@@ -330,7 +469,7 @@ out of the box in Nunjucks</p>
   <span class="k">return</span> <span class="nx">TemplateEngine</span><span class="p">;</span>
 <span class="p">};</span>
 
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="p">[</span><span class="s1">&#39;@require&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;nunjucks&#39;</span><span class="p">,</span> <span class="s1">&#39;fs-more&#39;</span><span class="p">];</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="p">[</span><span class="s1">&#39;@require&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;nunjucks&#39;</span><span class="p">,</span> <span class="s1">&#39;fs-more&#39;</span><span class="p">,</span> <span class="s1">&#39;require.wrapper&#39;</span><span class="p">];</span>
 </pre></div>
         </td>
       </tr>

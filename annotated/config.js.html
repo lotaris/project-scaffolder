@@ -211,7 +211,8 @@ the the project properly.</p>
 </div>
 <div class="dox">
   <div class="summary"><p>Read the template configuration to be able to prompt the user about the
-project generation from the template.</p>
+project generation from the template. It also load extras configuration
+and process to the configuration.</p>
   </div>
   <div class="body">
   </div>
@@ -226,7 +227,7 @@ project generation from the template.</p>
 </div>
         </td>
         <td class="code highlight"><div class="highlight"><pre>
-    <span class="nx">readConfiguration</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">configure</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
       <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
 
 
@@ -259,10 +260,82 @@ project generation from the template.</p>
 <div class="pilwrap">
   <a class="pilcrow" href="#section-8" id="section-8">&#182;</a>
 </div>
-<p>Store the template configuration inside the global configuration</p>
+<p>Store the loaded config in a working variable</p>
         </td>
         <td class="code highlight"><div class="highlight"><pre>
-          <span class="k">this</span><span class="p">.</span><span class="nx">templateConfig</span> <span class="o">=</span> <span class="nx">yaml</span><span class="p">.</span><span class="nx">safeLoad</span><span class="p">(</span><span class="nx">content</span><span class="p">);</span>
+          <span class="kd">var</span> <span class="nx">loadedConfig</span> <span class="o">=</span> <span class="nx">yaml</span><span class="p">.</span><span class="nx">safeLoad</span><span class="p">(</span><span class="nx">content</span><span class="p">);</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-9" id="section-9">&#182;</a>
+</div>
+<p>Ensure the properties are only the ones accepted by prompt</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+          <span class="kd">var</span> <span class="nx">promptProperties</span><span class="p">;</span>
+          <span class="k">if</span> <span class="p">(</span><span class="nx">loadedConfig</span><span class="p">.</span><span class="nx">prompt</span><span class="p">)</span> <span class="p">{</span>
+             <span class="nx">promptProperties</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+              <span class="nx">loadedConfig</span><span class="p">.</span><span class="nx">prompt</span><span class="p">.</span><span class="nx">properties</span> <span class="o">||</span> <span class="p">{},</span>
+              <span class="kd">function</span><span class="p">(</span><span class="nx">memo</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">memo</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">pick</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;pattern&#39;</span><span class="p">,</span> <span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="s1">&#39;hidden&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">);</span>
+                <span class="k">return</span> <span class="nx">memo</span><span class="p">;</span>
+              <span class="p">},</span>
+              <span class="p">{}</span>
+            <span class="p">);</span>
+          <span class="p">}</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-10" id="section-10">&#182;</a>
+</div>
+<p>Be sure there is an extras array and if yes, be sure this is an array</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+          <span class="kd">var</span> <span class="nx">extras</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">loadedConfig</span><span class="p">.</span><span class="nx">extras</span><span class="p">)</span> <span class="o">?</span> <span class="nx">loadedConfig</span><span class="p">.</span><span class="nx">extras</span> <span class="o">:</span> <span class="p">[];</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-11" id="section-11">&#182;</a>
+</div>
+<p>Build the configuration</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+          <span class="k">this</span><span class="p">.</span><span class="nx">templateConfig</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="nx">prompt</span><span class="o">:</span> <span class="p">{</span>
+              <span class="nx">properties</span><span class="o">:</span> <span class="nx">promptProperties</span>
+            <span class="p">},</span>
+            <span class="nx">extras</span><span class="o">:</span> <span class="nx">extras</span>
+          <span class="p">};</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-12" id="section-12">&#182;</a>
+</div>
+<p>Add more configuration to the template engine</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+          <span class="k">this</span><span class="p">.</span><span class="nx">templateEngine</span><span class="p">.</span><span class="nx">configure</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">templateConfig</span><span class="p">.</span><span class="nx">extras</span><span class="p">);</span>
+
           <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">();</span>
         <span class="p">}</span>
       <span class="p">},</span> <span class="k">this</span><span class="p">));</span>
@@ -277,7 +350,7 @@ project generation from the template.</p>
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-9" id="section-9">&#182;</a>
+  <a class="pilcrow" href="#section-13" id="section-13">&#182;</a>
 </div>
 <div class="dox">
   <div class="summary"><p>Manage a prompt to invite the user to answer few questions that will
@@ -308,7 +381,7 @@ be used during the project generation from the template.</p>
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-10" id="section-10">&#182;</a>
+  <a class="pilcrow" href="#section-14" id="section-14">&#182;</a>
 </div>
 <p>Add the <code>outputDirectory</code> property to be asked to the user</p>
         </td>
@@ -327,7 +400,7 @@ be used during the project generation from the template.</p>
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-11" id="section-11">&#182;</a>
+  <a class="pilcrow" href="#section-15" id="section-15">&#182;</a>
 </div>
 <div class="dox">
   <div class="summary"><p>The output directory is extracted from the project configuration

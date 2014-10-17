@@ -1,1 +1,1 @@
-var tree={"files":["cli.env.js","cli.js","config.js","factory.js","index.js","ioc.js","operations.builder.js","operations.js","operations.processor.js","print.js","prompt.wrapper.js","scaffolder.js","template.engine.js"]};
+var tree={"files":["cli.env.js","cli.js","config.js","factory.js","index.js","ioc.js","operations.builder.js","operations.js","operations.processor.js","print.js","prompt.wrapper.js","require.wrapper.js","scaffolder.js","template.engine.js"]};
