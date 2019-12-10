@@ -1,3 +1,7 @@
+### :warning: Unmaintained.
+
+---
+
 # project-scaffolder
 
 > Create project from templates with cool templating capabilities to replace variables in files and paths.
